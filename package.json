@@ -1,0 +1,22 @@
+{
+  "name": "mithril-flux",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abradley2/mithril-flux.git"
+  },
+  "author": "Tony Bradley",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/abradley2/mithril-flux/issues"
+  },
+  "homepage": "https://github.com/abradley2/mithril-flux#readme",
+  "dependencies": {
+    "mithril": "^0.2.5"
+  }
+}
