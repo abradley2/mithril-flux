@@ -1,30 +1,41 @@
+import * as m from 'mithril'
 import dispatcher from '../dispatcher'
 
-interface todo {
-    id?: number
-    title: string
-    completed: boolean
-}
+const todoActions = {
 
-export function createTodo (newTodo: todo) : void {
+    createTodo: (newTodo: App.Todos.TodoModel) : void => {
 
-    var payload : payloads.todos.CREATE_TODO = {
-        action: 'CREATE_TODO',
-        todo: <todo> newTodo
+        var payload : App.Todos.CREATE_TODO = {
+            action: 'CREATE_TODO',
+            todo: newTodo
+        }
+
+        dispatcher.dispatch(payload)
+
+    },
+
+    toggleCompleted: (id: number) : void => {
+
+        var payload : App.Todos.TOGGLE_COMPLETED = {
+            action: 'TOGGLE_COMPLETED',
+            id: id
+        }
+
+        dispatcher.dispatch(payload)
+
+    },
+
+    removeTodo: (todoId: number) : void => {
+
+        var payload : App.Todos.DELETE_TODO = {
+            action: 'DELETE_TODO',
+            id: todoId
+        }
+
+        dispatcher.dispatch(payload)
+
     }
 
-    dispatcher.dispatch(payload)
-
 }
 
-export function removeTodo (todoId: number) : void {
-
-    var payload : payloads.todos.REMOVE_TODO = {
-        action: 'REMOVE_TODO',
-        todoId: todoId
-    }
-
-
-    dispatcher.dispatch(payload)
-
-}
+export default todoActions

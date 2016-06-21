@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "browserify ts/app.ts -p tsify -o public/app.js",
+    "build-scripts": "browserify ts/app.ts -p tsify -o public/app.js",
+    "watch-scripts": "watchify ts/app.ts -p tsify -o public/app.js",
     "test": "test"
   },
   "repository": {

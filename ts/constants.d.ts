@@ -1,25 +1,32 @@
-declare namespace payloads {
+declare namespace App {
 
-    namespace todos {
+    namespace Todos {
+
+        interface TodoModel {
+            id?: number
+            title: string
+            completed: boolean
+        }
 
         interface CREATE_TODO {
             action: 'CREATE_TODO'
-            todo: {
-                title: string
-            }
+            todo: TodoModel
         }
 
-        interface REMOVE_TODO {
-            action: 'REMOVE_TODO',
-            todoId: number
+        interface DELETE_TODO {
+            action: 'DELETE_TODO'
+            id: number
         }
 
-        interface UPDATE_TODO {
-
+        interface TOGGLE_COMPLETED {
+            action: 'TOGGLE_COMPLETED'
+            id: number
         }
 
-        interface EDIT_TODO {
-
+        interface EDIT_TITLE {
+            action: 'UPDATE_TODO'
+            id: number
+            title: string
         }
 
     }
