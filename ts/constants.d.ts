@@ -1,15 +1,27 @@
 declare namespace payloads {
 
-    namespace session {
-        interface LOGIN {
-            action: string
-            username: string
-            password: string
+    namespace todos {
+
+        interface CREATE_TODO {
+            action: 'CREATE_TODO'
+            todo: {
+                title: string
+            }
         }
 
-        interface LOGOUT {
-            action: string
+        interface REMOVE_TODO {
+            action: 'REMOVE_TODO',
+            todoId: number
         }
+
+        interface UPDATE_TODO {
+
+        }
+
+        interface EDIT_TODO {
+
+        }
+
     }
 
 }

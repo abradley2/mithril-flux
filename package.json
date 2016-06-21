@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "browserify ts/app.ts -p tsify -o public/app.js",
     "test": "test"
   },
   "repository": {
@@ -18,5 +19,10 @@
   "homepage": "https://github.com/abradley2/mithril-flux#readme",
   "dependencies": {
     "mithril": "^0.2.5"
+  },
+  "devDependencies": {
+    "browserify": "^13.0.1",
+    "tsify": "^0.16.0",
+    "watchify": "^3.7.0"
   }
 }
