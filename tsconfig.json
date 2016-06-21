@@ -14,14 +14,14 @@
         "noLib": false,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
-        "outDir": "./js"
+        "outDir": "./out/build"
     },
     "exclude": [
         "node_modules",
         "typings/browser",
         "typings/browser.d.ts"
     ],
-    "compileOnSave": true,
+    "compileOnSave": false,
     "buildOnSave": false,
     "atom": {
         "rewriteTsconfig": false

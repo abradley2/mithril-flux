@@ -13,7 +13,7 @@ class Dispatcher {
     }
 
     dispatch (payload: any) {
-        this.callbacks.forEach(function (cb) {
+        this.callbacks.forEach((cb) => {
             cb(payload)
         })
     }
@@ -26,4 +26,4 @@ class Dispatcher {
 
 }
 
-export default Dispatcher
+export default new Dispatcher()
