@@ -1,12 +1,13 @@
 import * as m from 'mithril'
 
-import todosView from './views/todosView'
+import todoList from './components/todoList'
+
+m.route.mode = 'pathname'
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    m.mount(
-        document.querySelector('body'),
-        todosView
-    )
+    m.route(document.querySelector('body'), '/', {
+        '/': todoList
+    })
 
 })

@@ -2236,7 +2236,7 @@
 },{}],2:[function(require,module,exports){
 "use strict";
 var dispatcher_1 = require('../dispatcher');
-var todoActions = {
+var todoListActions = {
     createTodo: function (newTodo) {
         var payload = {
             action: 'CREATE_TODO',
@@ -2257,20 +2257,92 @@ var todoActions = {
             id: todoId
         };
         dispatcher_1.default.dispatch(payload);
+    },
+    removeCompleted: function () {
+        var payload = {
+            action: 'REMOVE_COMPLETED'
+        };
+        dispatcher_1.default.dispatch(payload);
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = todoActions;
+exports.default = todoListActions;
 
-},{"../dispatcher":4}],3:[function(require,module,exports){
+},{"../dispatcher":5}],3:[function(require,module,exports){
 "use strict";
 var m = require('mithril');
-var todosView_1 = require('./views/todosView');
+var todoList_1 = require('./components/todoList');
+m.route.mode = 'pathname';
 document.addEventListener('DOMContentLoaded', function () {
-    m.mount(document.querySelector('body'), todosView_1.default);
+    m.route(document.querySelector('body'), '/', {
+        '/': todoList_1.default
+    });
 });
 
-},{"./views/todosView":6,"mithril":1}],4:[function(require,module,exports){
+},{"./components/todoList":4,"mithril":1}],4:[function(require,module,exports){
+"use strict";
+var m = require('mithril');
+var todoListActions_1 = require('../actions/todoListActions');
+var todosStore_1 = require('../stores/todosStore');
+var TodoList = (function () {
+    function TodoList() {
+    }
+    TodoList.prototype.controller = function () {
+        return {
+            todos: todosStore_1.default.getAll(),
+            state: {
+                newTodo: m.prop({
+                    title: '',
+                    completed: false
+                })
+            }
+        };
+    };
+    TodoList.prototype.view = function (ctrl) {
+        var todos = ctrl.todos, state = ctrl.state, actions = todoListActions_1.default;
+        return m('div', [
+            m('div', [
+                m('input[type="text"]', {
+                    value: state.newTodo().title,
+                    onchange: function (e) {
+                        state.newTodo().title = e.target.value;
+                    }
+                }),
+                m('button[type="button"]', {
+                    onclick: function (e) {
+                        actions.createTodo(ctrl.state.newTodo());
+                        state.newTodo({
+                            title: '',
+                            completed: false
+                        });
+                    }
+                }, 'Add Todo')
+            ]),
+            m('ul', todos().map(function (todo) {
+                return m('li', [
+                    m('button[type="button"]', {
+                        onclick: function (e) {
+                            actions.toggleCompleted(todo.id);
+                        }
+                    }, todo.completed ? 'X' : 'O'),
+                    m('span', todo.title)
+                ]);
+            })),
+            m('div', [
+                m('button[type="button"]', {
+                    onclick: function (e) {
+                        actions.removeCompleted();
+                    }
+                }, 'Remove Completed')
+            ])
+        ]);
+    };
+    return TodoList;
+}());
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = new TodoList();
+
+},{"../actions/todoListActions":2,"../stores/todosStore":6,"mithril":1}],5:[function(require,module,exports){
 "use strict";
 var Dispatcher = (function () {
     function Dispatcher() {
@@ -2290,17 +2362,28 @@ var Dispatcher = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = new Dispatcher();
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var m = require('mithril');
 var dispatcher_1 = require('../dispatcher');
-var _todos = m.prop([
-    { id: Date.now(), title: 'my todo', completed: false }
-]);
-var todosStore = {
-    get: function (id) {
+var clone_1 = require('../util/clone');
+var EventEmitter_1 = require('../util/EventEmitter');
+var TodosStore = (function (_super) {
+    __extends(TodosStore, _super);
+    function TodosStore() {
+        _super.apply(this, arguments);
+        this._todos = m.prop([
+            { id: Date.now(), title: 'my todo', completed: false }
+        ]);
+    }
+    TodosStore.prototype.getById = function (id) {
         var retVal;
-        _todos().some(function (todo) {
+        this._todos().some(function (todo) {
             if (todo.id === id) {
                 retVal = todo;
                 return true;
@@ -2309,43 +2392,53 @@ var todosStore = {
                 return false;
             }
         });
-        return retVal;
-    },
-    getAll: function () {
-        return _todos();
-    },
-    CREATE_TODO: function (payload) {
-        payload.todo.id = Date.now();
-        _todos().push(payload.todo);
-    },
-    TOGGLE_COMPLETED: function (payload) {
-        _todos().some(function (todo, idx) {
+        return m.prop(retVal);
+    };
+    TodosStore.prototype.getAll = function () {
+        return this._todos;
+    };
+    TodosStore.prototype.CREATE_TODO = function (payload) {
+        var newTodo = clone_1.default(payload.todo);
+        newTodo.id = Date.now();
+        this._todos().push(newTodo);
+    };
+    TodosStore.prototype.TOGGLE_COMPLETED = function (payload) {
+        var _this = this;
+        this._todos().some(function (todo, idx) {
             if (todo.id === payload.id) {
-                _todos()[idx].completed = !todo.completed;
+                _this._todos()[idx].completed = !todo.completed;
                 return true;
             }
             else {
                 return false;
             }
         });
-    },
-    EDIT_TITLE: function (payload) {
-        _todos().some(function (todo, idx) {
+    };
+    TodosStore.prototype.EDIT_TITLE = function (payload) {
+        var _this = this;
+        this._todos().some(function (todo, idx) {
             if (todo.id === payload.id) {
-                _todos()[idx].title = payload.title;
+                _this._todos()[idx].title = payload.title;
                 return true;
             }
             else {
                 return false;
             }
         });
-    },
-    DELETE_TODO: function (payload) {
-        _todos(_todos().filter(function (todo) {
+    };
+    TodosStore.prototype.DELETE_TODO = function (payload) {
+        this._todos(this._todos().filter(function (todo) {
             return todo.id !== payload.id;
         }));
-    }
-};
+    };
+    TodosStore.prototype.REMOVE_COMPLETED = function (payload) {
+        this._todos(this._todos().filter(function (todo) {
+            return todo.completed !== true;
+        }));
+    };
+    return TodosStore;
+}(EventEmitter_1.default));
+var todosStore = new TodosStore();
 dispatcher_1.default.register(function (payload) {
     if (todosStore[payload.action]) {
         todosStore[payload.action](payload);
@@ -2354,60 +2447,60 @@ dispatcher_1.default.register(function (payload) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = todosStore;
 
-},{"../dispatcher":4,"mithril":1}],6:[function(require,module,exports){
+},{"../dispatcher":5,"../util/EventEmitter":7,"../util/clone":8,"mithril":1}],7:[function(require,module,exports){
 "use strict";
-var m = require('mithril');
-var todoActions_1 = require('../actions/todoActions');
-var todoStore_1 = require('../stores/todoStore');
-function todosController() {
-    return {
-        newTodo: {
-            title: '',
-            completed: false
+var EventEmitter = (function () {
+    function EventEmitter() {
+        this.events = {};
+    }
+    EventEmitter.prototype.on = function (event, cb) {
+        if (this.events[event]) {
+            this.events[event].push(cb);
         }
+        else {
+            this.events[event] = [cb];
+        }
+        return this.events[event][this.events[event].length - 1];
     };
-}
-function todosView(vm) {
-    var actions = todoActions_1.default, todos = todoStore_1.default.getAll();
-    return m('div.todo-list', [
-        m('div.new-todo', [
-            m('input[type="text"]', {
-                value: vm.newTodo.title,
-                onchange: function (e) {
-                    vm.newTodo.title = e.target.value;
-                }
-            }),
-            m('button[type=button]', {
-                onclick: function (e) {
-                    actions.createTodo(vm.newTodo);
-                    vm.newTodo = {
-                        title: '',
-                        completed: false
-                    };
-                }
-            }, 'Add Todo')
-        ]),
-        m('ul.todos', todos.map(function (todo) {
-            return m('li.todo', [
-                m('button[type="button"]', {
-                    onclick: function () {
-                        actions.toggleCompleted(todo.id);
-                    }
-                }, todo.completed ? 'X' : 'O'),
-                m('span', todo.title)
-            ]);
-        })),
-        m('div.routes', [
-            m('a[href="todos/all"]', 'All'),
-            m('a[href="todos/incomplete"]', 'Incomplete'),
-            m('a[href="todos/complete"]', 'Completed')
-        ])
-    ]);
+    EventEmitter.prototype.off = function (cb) {
+        var _this = this;
+        Object.keys(this.events).forEach(function (event) {
+            _this.events[event] = _this.events[event].filter(function (registeredCb) {
+                return registeredCb !== cb;
+            });
+        });
+    };
+    EventEmitter.prototype.trigger = function (event, data) {
+        this.events[event].forEach(function (cb) {
+            cb(data);
+        });
+    };
+    return EventEmitter;
+}());
+var events = new EventEmitter();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = EventEmitter;
+
+},{}],8:[function(require,module,exports){
+"use strict";
+function clone(obj) {
+    if (Array.isArray(obj)) {
+        return obj.map(clone);
+    }
+    else if (typeof obj === 'object' && obj !== null) {
+        var newObj = {}, attr = void 0;
+        for (attr in obj) {
+            if (Object.hasOwnProperty.call(obj, attr)) {
+                newObj[attr] = clone(obj[attr]);
+            }
+        }
+        return newObj;
+    }
+    else {
+        return obj;
+    }
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = {
-    controller: todosController,
-    view: todosView
-};
+exports.default = clone;
 
-},{"../actions/todoActions":2,"../stores/todoStore":5,"mithril":1}]},{},[3]);
+},{}]},{},[3]);
