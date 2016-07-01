@@ -1,9 +1,8 @@
 import * as m from 'mithril'
 import dispatcher from '../dispatcher'
-import clone from '../util/clone'
-import EventEmitter from '../util/EventEmitter'
+import * as _ from 'underscore'
 
-class TodosStore extends EventEmitter {
+class TodoStore {
 
     _todos : Mithril.Property<Entities.Todo[]> = m.prop([
         {id: Date.now(), title: 'my todo', completed: false }
@@ -30,15 +29,15 @@ class TodosStore extends EventEmitter {
 
     // ACTIONS
 
-    CREATE_TODO (payload: Actions.Todos.CREATE_TODO) : void {
-        var newTodo = <Entities.Todo> clone(payload.todo)
+    'Todos.CREATE_TODO' (payload: Actions.Todos.CREATE_TODO) : void {
+        var newTodo = <Entities.Todo> _.clone(payload.todo)
 
         newTodo.id = Date.now()
         this._todos().push( newTodo )
 
     }
 
-    TOGGLE_COMPLETED (payload: Actions.Todos.TOGGLE_COMPLETED) : void {
+    'Todos.TOGGLE_COMPLETED' (payload: Actions.Todos.TOGGLE_COMPLETED) : void {
         this._todos().some((todo, idx) => {
             if (todo.id === payload.id) {
                 this._todos()[idx].completed = !todo.completed
@@ -49,7 +48,7 @@ class TodosStore extends EventEmitter {
         })
     }
 
-    EDIT_TITLE (payload: Actions.Todos.EDIT_TITLE) : void {
+    'Todos.EDIT_TITLE' (payload: Actions.Todos.EDIT_TITLE) : void {
         this._todos().some((todo, idx) => {
             if (todo.id === payload.id) {
                 this._todos()[idx].title = payload.title
@@ -60,7 +59,7 @@ class TodosStore extends EventEmitter {
         })
     }
 
-    DELETE_TODO (payload: Actions.Todos.DELETE_TODO) : void {
+    'Todos.DELETE_TODO' (payload: Actions.Todos.DELETE_TODO) : void {
         this._todos(
             this._todos().filter((todo) => {
                 return todo.id !== payload.id
@@ -68,7 +67,7 @@ class TodosStore extends EventEmitter {
         )
     }
 
-    REMOVE_COMPLETED (payload: Actions.Todos.REMOVE_COMPLETED) : void {
+    'Todos.REMOVE_COMPLETED' (payload: Actions.Todos.REMOVE_COMPLETED) : void {
         this._todos(
             this._todos().filter((todo) => {
                 return todo.completed !== true
@@ -76,16 +75,23 @@ class TodosStore extends EventEmitter {
         )
     }
 
-}
+    dispatchToken: number
 
-var todosStore = new TodosStore()
+    constructor (dispatcher) {
 
-dispatcher.register((payload) => {
+        this.dispatchToken = dispatcher.register((payload) => {
 
-    if ( todosStore[payload.action] ) {
-        todosStore[payload.action](payload)
+            switch (payload.action) {
+                default:
+                    if (this[payload.action]) this[payload.action](payload)
+                    break
+            }
+
+        })
+
     }
 
-})
+}
 
-export default todosStore
+
+export default new TodoStore(dispatcher)

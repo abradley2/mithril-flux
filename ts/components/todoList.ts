@@ -1,32 +1,48 @@
 import * as m from 'mithril'
-import todoListActions from '../actions/todoListActions'
-import todosStore from '../stores/todosStore'
+import dispatcher from '../dispatcher'
+import TodoStore from '../stores/TodoStore'
 
-interface ICtrl {
-    todos: Mithril.Property<Entities.Todo[]>,
+class TodoController extends Mithril.Controller {
+
+    addTodo () {
+
+    }
+
+    removeTodo () {
+
+    }
+
+    editTodo () {
+
+    }
+
+    toggleTodoComplete () {
+
+    }
+
+    removeCompleted () {
+
+    }
+
+    constructor (args: any) {
+
+    }
+
+    todos: Mithril.Property<Entities.Todo[]>
     state: {
         newTodo: Mithril.Property<Entities.Todo>
     }
 }
 
-class TodoList implements Mithril.Component<ICtrl> {
+class TodoList implements Mithril.Component<TodoController> {
 
-    controller () : ICtrl {
-        return {
-            todos: todosStore.getAll(),
-            state: {
-                newTodo: m.prop({
-                    title: '',
-                    completed: false
-                })
-            }
-        }
+    controller () : TodoController {
+        return new TodoController()
     }
 
-    view (ctrl: ICtrl) {
+    view (ctrl: TodoController) {
         var todos = ctrl.todos,
-            state = ctrl.state,
-            actions = todoListActions
+            state = ctrl.state
 
         return m('div', [
             m('div', [
