@@ -1,2 +1,2 @@
 # Flux and Mithril
-... and typescript
+... and TypeScript

@@ -17,7 +17,7 @@ declare namespace Actions {
         }
 
         interface EDIT_TITLE {
-            action: 'Todos.UPDATE_TODO'
+            action: 'Todos.EDIT_TITLE'
             id: number
             title: string
         }

@@ -4,8 +4,8 @@ class Dispatcher {
 
     _isDispatching : boolean = false
     _activePayload : any = null
-    _isPending: {[key: number]: boolean}
-    _isHandled: {[key: number]: boolean}
+    _isPending: {[key: number]: boolean} = {}
+    _isHandled: {[key: number]: boolean} = {}
 
     register (cb: callback) : number {
         this.callbacks.push(cb)
@@ -46,11 +46,12 @@ class Dispatcher {
     }
 
     waitFor (tokens: number[]) {
-        tokens.forEach((token) => {
+        var token
+        for (token in tokens) {
             if (!this._isPending[token]) {
                 this._invokeCallback(token, this._activePayload)
             }
-        })
+        }
     }
 
     callbacks:  callback[] = []

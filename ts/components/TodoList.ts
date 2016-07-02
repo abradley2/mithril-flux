@@ -2,42 +2,71 @@ import * as m from 'mithril'
 import dispatcher from '../dispatcher'
 import TodoStore from '../stores/TodoStore'
 
-class TodoController extends Mithril.Controller {
+class TodoController implements Mithril.Controller {
 
-    addTodo () {
+    addTodo (todo: Entities.Todo) {
+        var payload : Actions.Todos.CREATE_TODO = {
+            action: 'Todos.CREATE_TODO',
+            todo: todo
+        }
 
+        dispatcher.dispatch(payload)
     }
 
-    removeTodo () {
+    removeTodo (id: number) {
+        var payload : Actions.Todos.DELETE_TODO = {
+            action: 'Todos.DELETE_TODO',
+            id: id
+        }
 
+        dispatcher.dispatch(payload)
     }
 
-    editTodo () {
+    editTodoTitle (id: number, title: string) {
+        var payload : Actions.Todos.EDIT_TITLE = {
+            action: 'Todos.EDIT_TITLE',
+            title: title,
+            id: id
+        }
 
+        dispatcher.dispatch(payload)
     }
 
-    toggleTodoComplete () {
+    toggleTodoComplete (todo: Entities.Todo) {
+        var payload : Actions.Todos.TOGGLE_COMPLETED = {
+            action: 'Todos.TOGGLE_COMPLETED',
+            id: todo.id
+        }
 
+        dispatcher.dispatch(payload)
     }
 
     removeCompleted () {
+        var payload : Actions.Todos.REMOVE_COMPLETED = {
+            action: 'Todos.REMOVE_COMPLETED'
+        }
+
+        dispatcher.dispatch(payload)
+    }
+
+    todos = TodoStore.getAll()
+    state = {
+        newTodo: <Mithril.Property<Entities.Todo>>m.prop({
+            title: '',
+            completed: false
+        })
+    }
+
+    constructor (args) {
 
     }
 
-    constructor (args: any) {
-
-    }
-
-    todos: Mithril.Property<Entities.Todo[]>
-    state: {
-        newTodo: Mithril.Property<Entities.Todo>
-    }
 }
 
 class TodoList implements Mithril.Component<TodoController> {
 
-    controller () : TodoController {
-        return new TodoController()
+    controller (args) : TodoController {
+        return new TodoController(args)
     }
 
     view (ctrl: TodoController) {
@@ -54,7 +83,7 @@ class TodoList implements Mithril.Component<TodoController> {
                 }),
                 m('button[type="button"]', {
                     onclick: (e) => {
-                        actions.createTodo(ctrl.state.newTodo())
+                        ctrl.addTodo(ctrl.state.newTodo())
                         state.newTodo({
                             title: '',
                             completed: false
@@ -66,16 +95,21 @@ class TodoList implements Mithril.Component<TodoController> {
                 return m('li', [
                     m('button[type="button"]', {
                         onclick: (e) => {
-                            actions.toggleCompleted(todo.id)
+                            ctrl.toggleTodoComplete(todo)
                         }
                     }, todo.completed ? 'X' : 'O'),
-                    m('span', todo.title)
+                    m('input[type="text"]', {
+                        value: todo.title,
+                        onchange: (e) => {
+                            ctrl.editTodoTitle(todo.id, e.target.value)
+                        }
+                    })
                 ])
             })),
             m('div', [
                 m('button[type="button"]', {
                     onclick: (e) => {
-                        actions.removeCompleted()
+                        ctrl.removeCompleted()
                     }
                 }, 'Remove Completed')
             ])

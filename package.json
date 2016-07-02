@@ -13,7 +13,7 @@
     "url": "git+https://github.com/abradley2/mithril-flux.git"
   },
   "author": "Tony Bradley",
-  "license": "MIT",
+  "license": "unlicense",
   "bugs": {
     "url": "https://github.com/abradley2/mithril-flux/issues"
   },
