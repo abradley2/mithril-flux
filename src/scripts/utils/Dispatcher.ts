@@ -54,12 +54,25 @@ class Dispatcher {
         }
     }
 
-    callbacks:  callback[] = []
+    wrapActions <A> (actionCreators: A): A {
+        const dispatcher = this
 
-    constructor () {
-
+        for (let action in actionCreators) {
+            if (Object.hasOwnProperty.call(actionCreators, action)) {
+                actionCreators[action] = (function (handler) {
+                    return function () {
+                        const action = handler.apply(handler, arguments)
+                        dispatcher.dispatch(action)
+                    }
+                })(actionCreators[action])
+            }
+        }
+        return actionCreators
     }
+
+    callbacks:  callback[] = []
+    debug: boolean = false
 
 }
 
-export default new Dispatcher()
+export default Dispatcher
