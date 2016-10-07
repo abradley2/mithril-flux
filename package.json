@@ -1,30 +1,25 @@
 {
-  "name": "mithril-flux",
+  "name": "create-mithril-flux-app",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build-scripts": "browserify ts/main.ts -p tsify -o public/dist/scripts/app.js",
-    "watch-scripts": "watchify ts/main.ts -p tsify -o public/dist/scripts/app.js",
+    "build": "webpack ./src/main.js ./public/main.bundle.js",
+    "watch": "webpack --watch ./src/main.js ./public/main.bundle.js",
     "test": "test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/abradley2/mithril-flux.git"
+    "url": "git+https://github.com/abradley2create-mithril-flux-app.git"
   },
   "author": "Tony Bradley",
-  "license": "unlicense",
+  "license": "Unlicense",
   "bugs": {
-    "url": "https://github.com/abradley2/mithril-flux/issues"
+    "url": "https://github.com/abradley2/create-mithril-flux-app/issues"
   },
-  "homepage": "https://github.com/abradley2/mithril-flux#readme",
+  "homepage": "https://github.com/abradley2/create-mithril-flux-app#readme",
   "dependencies": {
-    "browserify": "^13.1.0",
-    "mithril": "^0.2.5",
-    "shortid": "^2.2.6",
-    "tsify": "^1.0.6",
-    "typescript": "^2.0.0",
-    "watchify": "^3.7.0"
+    "mithril": "latest"
   },
   "devDependencies": {}
 }

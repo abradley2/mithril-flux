@@ -1,0 +1,4 @@
+exports.AppActions = {
+	INCREMENT: 'INCREMENT',
+	DECREMENT: 'DECREMENT'
+}
