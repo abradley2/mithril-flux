@@ -1,6 +1,6 @@
 var dispatcher = require('../dispatcher')
 
-function Store () {
+function Store (initialState) {
 	this.state = initialState || {}
 	this.handlers = {}
 
@@ -12,7 +12,7 @@ function Store () {
 
 			this.state = newState
 		}
-	})
+	}.bind(this))
 }
 
 Store.prototype.get = function (attr) {

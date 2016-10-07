@@ -1,7 +1,7 @@
 var dispatcher = require('../dispatcher')
 var AppActions = require('../constants').AppActions
-var createStore = require('./util/createStore')
-var cloneWithProps = require('./util/cloneWithProps')
+var createStore = require('../util/createStore')
+var cloneWithProps = require('../util/cloneWithProps')
 
 var AppStore = createStore({
 	count: 1
@@ -10,7 +10,7 @@ var AppStore = createStore({
 AppStore.on(AppActions.INCREMENT, function (action, oldState) {
 
 	return cloneWithProps(oldState, {
-		count: state.count + 1
+		count: oldState.count + 1
 	})
 
 })
@@ -18,7 +18,7 @@ AppStore.on(AppActions.INCREMENT, function (action, oldState) {
 AppStore.on(AppActions.DECREMENT, function (action, oldState) {
 
 	return cloneWithProps(oldState, {
-		count: state.count - 1
+		count: oldState.count - 1
 	})
 	
 })
